@@ -1,0 +1,64 @@
+/**
+ * UDS Design Tokens
+ * ソース：Google Drive `upward-design-system-knowledge` 内の各 components/*.md に
+ * 明記されている実測 hex 値のみを使用。Figmaへのアクセスは行っていない。
+ */
+:root {
+  /* color/foreground/* */
+  --color-foreground-default: #282c33;
+  --color-foreground-muted: #75808c;
+  --color-foreground-subtle: #96a2ac;
+  --color-foreground-danger: #f44c4d;
+  --color-foreground-accent: #0070fa;
+
+  /* color/border/* */
+  --color-border-normal: #d2dce3;
+  --color-border-soft: #e4ecf2;
+  --color-border-accent: #0070fa;
+  --color-border-danger: #f44c4d;
+  --color-border-success: #1dc338;
+
+  /* color/button/* (button.md) */
+  --color-button-primary-default: #0070fa;
+  --color-button-primary-hovered: #0046eb;
+  --color-button-primary-pressed: #0930bf;
+  --color-button-danger-default: #f44c4d;
+  --color-button-danger-hovered: #d21b1e;
+  --color-button-danger-pressed: #a90004;
+
+  /* color/surface/* */
+  --color-surface-default: #ffffff;
+  --color-surface-shade: #e4ecf2;
+  --color-surface-tint: #f1f7fb;
+  --color-surface-tone: #d2dce3; /* textarea-field.md */
+  --color-surface-transparent-tint: rgba(0, 102, 153, 0.06);
+  --color-surface-transparent-shade: rgba(0, 102, 153, 0.12);
+
+  /* color/system/* */
+  --color-system-focus-ring: #6bb2ff; /* select-field-dropdown.md */
+
+  /* color/callout/* (callout.md) */
+  --color-callout-infomation: #eff8ff;
+  --color-callout-danger: #fff4f4;
+  --color-callout-success: #edfeee;
+  --color-callout-warning: #fff5ec;
+  --color-feedback-progress-active: #ff970c;
+
+  /* avatar/* (avatar.md) */
+  --avatar-icon-background: rgba(0, 102, 153, 0.06);
+  --avatar-letter-text: #ffffff;
+
+  /* tag.md：状態系＋分類色 */
+  --color-feedback-progress-upcoming: #1dc338;
+  --color-feedback-progress-delayed: #f44c4d;
+  --color-feedback-progress-completed: #96a2ac;
+  --color-teal-60: #18d9dc;
+  --color-purple-60: #a97aff;
+  --color-blue-60: #3491ff;
+  --color-green-50: #009d20;
+  --color-orange-50: #e77700;
+  --color-red-50: #d21b1e;
+  --color-teal-50: #00babe;
+  --color-purple-50: #984eff;
+  --color-blue-50: #0070fa;
+}
