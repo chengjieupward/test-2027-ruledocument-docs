@@ -61,4 +61,13 @@
   --color-teal-50: #00babe;
   --color-purple-50: #984eff;
   --color-blue-50: #0070fa;
+
+  /* typography/body/md/regular (foundations-color-typography.md)
+     2026-09-09 新規追加：button.md の指摘により、Button と Typography.Body が
+     共有する単一の参照元として追加。今後 Typography.Body 側もこのトークンを
+     参照するように更新すること（現状はまだ Typography.Body 内に数値が
+     ハードコードされたまま、かつ全体のCSSのフォントは system-ui のまま） */
+  --typography-body-md-regular-font-family: 'Noto Sans JP', system-ui, sans-serif;
+  --typography-body-md-regular-font-size: 14px;
+  --typography-body-md-regular-line-height: 20px;
 }
