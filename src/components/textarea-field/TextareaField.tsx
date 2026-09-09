@@ -49,6 +49,10 @@ const MIN_THUMB_HEIGHT = 16;
     the fixed resize-corner icon -- they sit side by side, not stacked. */
 const ICON_RESERVE = 20;
 
+/** Small clearance at the top of the track so the thumb doesn't visually
+    clip into the container's rounded top-right corner. */
+const TOP_RESERVE = 8;
+
 /** Resize-corner icon: desktop-icon/notches (icon.md desktop-icon spec). */
 
 export function TextareaField({
@@ -70,11 +74,12 @@ export function TextareaField({
       return;
     }
     // The thumb's own movable track stops short of the icon's reserved space
-    // at the bottom, so the two never overlap -- they sit side by side.
-    const trackHeight = Math.max(0, clientHeight - ICON_RESERVE);
+    // at the bottom, and clears the rounded top corner at the top, so it
+    // never visually overlaps either -- side by side, not stacked/clipped.
+    const trackHeight = Math.max(0, clientHeight - ICON_RESERVE - TOP_RESERVE);
     const thumbHeight = Math.min(trackHeight, Math.max(MIN_THUMB_HEIGHT, (clientHeight / scrollHeight) * trackHeight));
     const maxTop = trackHeight - thumbHeight;
-    const top = (scrollTop / (scrollHeight - clientHeight)) * maxTop;
+    const top = TOP_RESERVE + (scrollTop / (scrollHeight - clientHeight)) * maxTop;
     setThumb({ top, height: thumbHeight, visible: true });
   };
 
