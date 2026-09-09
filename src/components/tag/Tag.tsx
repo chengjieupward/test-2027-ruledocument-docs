@@ -1,13 +1,23 @@
-import { X } from '@phosphor-icons/react';
+import { XCircle } from '@phosphor-icons/react';
 
 /**
  * Tag
  * Source: `components/tag.md` (doc-only, no Figma access).
- * Close button is an "x-circle" icon per the doc: solid circle + white X,
- * not a bare X. fill=true tags use a translucent white circle; fill=false
- * (tint) tags use a solid accent-color circle for contrast against the light bg.
  * Status colors (green/orange/red/natural) carry fixed business meaning per
  * tag.md Rules; blue/purple/teal are free-form category colors.
+ *
+ * 2026-09-09 doc revision applied (user-confirmed against a real Figma
+ * reference screenshot):
+ * - close button is a real inner-button (button.md, size=sm), fixed to 22px
+ *   to match the tag's own height exactly -- it does not overflow
+ * - uses the actual desktop-icon/x-circle glyph (Phosphor `XCircle`,
+ *   weight="fill"), size md=20px per icon.md, instead of manually
+ *   compositing a div circle + a separate X icon on top of it
+ * - fill=true tags: white x-circle (reads clearly against the colored bg).
+ *   fill=false (tint) tags: accent-color x-circle (unchanged intent from the
+ *   original doc, now expressed as a single-color icon glyph rather than a
+ *   two-tone circle+icon composite)
+ * - gap between label and the inner-button is 8px
  */
 
 export type TagColor = 'green' | 'orange' | 'red' | 'natural' | 'blue' | 'purple' | 'teal';
@@ -40,22 +50,23 @@ const TINT_STYLE: Record<TagColor, string> = {
   teal: 'bg-[rgba(24,217,220,0.1)] text-(--color-teal-50)',
 };
 
-const CLOSE_CIRCLE_STYLE: Record<TagColor, string> = {
-  green: 'bg-(--color-feedback-progress-upcoming)',
-  orange: 'bg-(--color-feedback-progress-active)',
-  red: 'bg-(--color-feedback-progress-delayed)',
-  natural: 'bg-(--color-feedback-progress-completed)',
-  blue: 'bg-(--color-blue-60)',
-  purple: 'bg-(--color-purple-60)',
-  teal: 'bg-(--color-teal-60)',
+// x-circle icon color for fill=false (tint) tags -- accent color per tag color.
+const ACCENT_COLOR_VAR: Record<TagColor, string> = {
+  green: 'var(--color-feedback-progress-upcoming)',
+  orange: 'var(--color-feedback-progress-active)',
+  red: 'var(--color-feedback-progress-delayed)',
+  natural: 'var(--color-feedback-progress-completed)',
+  blue: 'var(--color-blue-60)',
+  purple: 'var(--color-purple-60)',
+  teal: 'var(--color-teal-60)',
 };
 
 export function Tag({ color = 'green', fill = true, label, onClose, className }: TagProps) {
   return (
     <span
       className={[
-        'inline-flex h-[22px] items-center gap-1 rounded-full pl-2 text-xs leading-[18px] whitespace-nowrap',
-        onClose ? 'pr-1' : 'pr-2',
+        'inline-flex h-[22px] items-center gap-0.5 rounded-full pl-2 text-xs leading-[18px] whitespace-nowrap',
+        onClose ? 'pr-0' : 'pr-2',
         fill ? FILL_STYLE[color] : TINT_STYLE[color],
         className,
       ]
@@ -64,13 +75,15 @@ export function Tag({ color = 'green', fill = true, label, onClose, className }:
     >
       <span className="max-w-[8em] truncate">{label}</span>
       {onClose && (
+        // inner-button, size=sm, fixed to 22px to match the tag's own height
+        // exactly. Icon: desktop-icon/x-circle, md=20px (icon.md).
         <button
           type="button"
           onClick={onClose}
           aria-label="Remove"
-          className={['flex size-4 shrink-0 items-center justify-center rounded-full', fill ? 'bg-white/30' : CLOSE_CIRCLE_STYLE[color]].join(' ')}
+          className="flex size-[22px] shrink-0 items-center justify-center rounded-full hover:brightness-90"
         >
-          <X size={10} color="white" weight="bold" />
+          <XCircle size={20} weight="fill" color={fill ? 'white' : ACCENT_COLOR_VAR[color]} />
         </button>
       )}
     </span>

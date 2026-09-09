@@ -38,3 +38,12 @@ export const States: Story = {
     </div>
   ),
 };
+
+/** カスタムscroll-thumb（doc v4）：3行を超える内容で自動表示。ネイティブのスクロールバー/リサイズグリップは非表示 */
+function OverflowingContentDemo() {
+  const [value, setValue] = useState(
+    'Line 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8'
+  );
+  return <TextareaField label="Overflowing content (custom scroll-thumb)" value={value} onValueChange={setValue} />;
+}
+export const OverflowingContent: Story = { render: () => <OverflowingContentDemo /> };

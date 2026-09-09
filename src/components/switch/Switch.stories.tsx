@@ -10,8 +10,10 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+// 2026-09-09: default preview (top of the Docs page) should show the switch
+// in the "on" state, per user request.
 function BasicDemo() {
-  const [checked, setChecked] = useState(false);
+  const [checked, setChecked] = useState(true);
   return <Switch checked={checked} onCheckedChange={setChecked} />;
 }
 export const Basic: Story = { render: () => <BasicDemo /> };
@@ -35,7 +37,7 @@ export const LabelPositions: Story = {
 /** description付き（doc Anatomy） */
 export const WithDescription: Story = {
   render: () => (
-    <Switch label="Label" description="Description text goes here" checked={false} onCheckedChange={() => {}} />
+    <Switch label="Label" description="Description text goes here" checked onCheckedChange={() => {}} />
   ),
 };
 

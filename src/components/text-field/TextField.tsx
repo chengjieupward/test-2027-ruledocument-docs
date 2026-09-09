@@ -5,6 +5,15 @@ import { useId, type InputHTMLAttributes, type ReactNode } from 'react';
  * Source: `components/text-field.md` (doc-only, no Figma access).
  * Doc explicitly notes: no stepper, unlike number-field -- that's the
  * distinguishing feature of this simplest form field.
+ *
+ * 2026-09-09 doc revision applied:
+ * - description color is `color/foreground/muted`, not `-subtle` -- aligned
+ *   with the same token every other component's description uses (Avatar,
+ *   Switch, Checkbox, RadioButton, SelectField, TextareaField), even though
+ *   this doc had explicitly written `-subtle` (confirmed by user to be wrong)
+ * - labelPosition="left" label has its own 10px right padding (`pr-2.5`), in
+ *   addition to (not instead of) the existing 16px gap between label and
+ *   field -- the two stack, they aren't the same measurement recorded twice
  */
 
 export interface TextFieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
@@ -45,7 +54,7 @@ export function TextField({
   if (isLeft) {
     return (
       <div className={['flex items-start gap-4', className].filter(Boolean).join(' ')}>
-        {label && <label htmlFor={inputId} className="w-60 shrink-0 pt-2.5 text-sm leading-5 text-(--color-foreground-default)">{label}</label>}
+        {label && <label htmlFor={inputId} className="w-60 shrink-0 pt-2.5 pr-2.5 text-sm leading-5 text-(--color-foreground-default)">{label}</label>}
         {field}
       </div>
     );
@@ -55,7 +64,7 @@ export function TextField({
       {label && (
         <div className="flex flex-col gap-0.5">
           <label htmlFor={inputId} className="text-sm leading-5 text-(--color-foreground-default)">{label}</label>
-          {description && <p className="text-xs leading-[18px] text-(--color-foreground-subtle)">{description}</p>}
+          {description && <p className="text-xs leading-[18px] text-(--color-foreground-muted)">{description}</p>}
         </div>
       )}
       {field}

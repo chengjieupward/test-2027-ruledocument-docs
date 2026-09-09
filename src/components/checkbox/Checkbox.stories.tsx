@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Checkbox } from './Checkbox';
+import { CheckboxGroup } from './CheckboxGroup';
 
 const meta = {
   title: 'Form/Checkbox',
@@ -54,4 +55,30 @@ export const Disabled: Story = {
       <Checkbox label="Disabled checked" checked={true} disabled onCheckedChange={() => {}} />
     </div>
   ),
+};
+
+// CheckboxGroup demos live here as plain sibling stories (not a separate
+// nested component/folder), per user request -- CheckboxGroup is just a
+// layout wrapper around Checkbox, not a distinct top-level component.
+function GroupDemo(props: { labelPosition?: 'top' | 'left'; description?: string }) {
+  const [values, setValues] = useState({ a: true, b: false, c: false });
+  const toggle = (key: keyof typeof values) => (v: boolean) => setValues((prev) => ({ ...prev, [key]: v }));
+  return (
+    <CheckboxGroup label="Group label" description={props.description} labelPosition={props.labelPosition}>
+      <Checkbox label="Option A" checked={values.a} onCheckedChange={toggle('a')} />
+      <Checkbox label="Option B" checked={values.b} onCheckedChange={toggle('b')} />
+      <Checkbox label="Option C" checked={values.c} onCheckedChange={toggle('c')} />
+    </CheckboxGroup>
+  );
+}
+
+/** CheckboxGroup, labelPosition="top"（doc default）。description は任意項目のため既定ではoff */
+export const GroupLabelTop: Story = { render: () => <GroupDemo labelPosition="top" /> };
+
+/** CheckboxGroup, labelPosition="left"。description は任意項目のため既定ではoff */
+export const GroupLabelLeft: Story = { render: () => <GroupDemo labelPosition="left" /> };
+
+/** CheckboxGroup with description（doc Anatomy: description は任意） */
+export const GroupWithDescription: Story = {
+  render: () => <GroupDemo labelPosition="top" description="Group description" />,
 };

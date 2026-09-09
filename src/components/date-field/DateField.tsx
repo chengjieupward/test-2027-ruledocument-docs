@@ -8,6 +8,13 @@ import { CalendarDots } from '@phosphor-icons/react';
  * is a separate `date-picker-calendar` component, wired via onCalendarClick.
  * State (default/disabled/readonly/error) converted to 3 independent booleans
  * per the doc's implementation note, matching button.md/accordion.md pattern.
+ *
+ * 2026-09-09 doc revision applied:
+ * - .date-content is NOT fixed to the doc's old "210px" figure -- confirmed
+ *   flexible, same resolution as the analogous width questions in
+ *   SelectField/TextareaField/NumberField
+ * - description color is `color/foreground/muted`, not `-subtle` -- aligned
+ *   with every other component's description text
  */
 
 export interface DateFieldProps
@@ -74,7 +81,7 @@ export function DateField({
       {label && (
         <div className="flex flex-col gap-0.5">
           <label htmlFor={inputId} className="text-sm leading-5 text-(--color-foreground-default)">{label}</label>
-          {description && <p className="text-xs leading-[18px] text-(--color-foreground-subtle)">{description}</p>}
+          {description && <p className="text-xs leading-[18px] text-(--color-foreground-muted)">{description}</p>}
         </div>
       )}
       {inputRow}

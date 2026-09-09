@@ -1,4 +1,4 @@
-import { useId, useState } from 'react';
+import { useId, useState, type ReactNode } from 'react';
 import { Eye, EyeSlash } from '@phosphor-icons/react';
 
 /**
@@ -7,13 +7,24 @@ import { Eye, EyeSlash } from '@phosphor-icons/react';
  * ⚠️ Doc explicitly flags: the eye-slash icon's node-id was never confirmed
  * (only the placeholder/masked frame was measured). Using Phosphor's EyeSlash
  * here is a reasonable icon-set choice, not a verified match to the design.
+ *
+ * 2026-09-09 doc revision applied (user-confirmed):
+ * - the doc's asymmetric input padding-right is real, not a Figma mistake:
+ *   top layout uses 10px when error, 6px otherwise; left layout is always 6px
+ *   regardless of error
+ * - content width is NOT fixed to the doc's old "300px" figure -- confirmed
+ *   flexible, same resolution as the analogous width questions in other
+ *   form fields (SelectField/TextareaField/NumberField/DateField)
+ * - added description support (top layout only, matching the sibling form
+ *   fields), color `color/foreground/muted`
  */
 
 export interface PasswordFieldProps {
-  label?: React.ReactNode;
+  label?: ReactNode;
   labelPosition?: 'top' | 'left';
+  description?: ReactNode;
   error?: boolean;
-  errorMessage?: React.ReactNode;
+  errorMessage?: ReactNode;
   disabled?: boolean;
   readOnly?: boolean;
   value?: string;
@@ -25,7 +36,7 @@ export interface PasswordFieldProps {
 }
 
 export function PasswordField({
-  label, labelPosition = 'top', error = false, errorMessage, disabled = false, readOnly = false,
+  label, labelPosition = 'top', description, error = false, errorMessage, disabled = false, readOnly = false,
   value, onValueChange, placeholder = 'placeholder', id, name, className,
 }: PasswordFieldProps) {
   const autoId = useId();
@@ -33,10 +44,15 @@ export function PasswordField({
   const isLeft = labelPosition === 'left';
   const [visible, setVisible] = useState(false);
 
+  // Doc's asymmetric padding-right: top layout differs by error state,
+  // left layout is always the smaller (6px) value regardless of error.
+  const paddingRightClass = !isLeft && error ? 'pr-2.5' : 'pr-1.5';
+
   const field = (
     <div className={isLeft ? 'min-w-0 flex-1' : 'w-full shrink-0'}>
       <div className={[
-        'flex items-center gap-2 rounded-xl border pl-3 pr-1.5',
+        'flex items-center gap-2 rounded-xl border pl-3',
+        paddingRightClass,
         error ? 'border-(--color-border-danger)' : 'border-(--color-border-normal)',
         readOnly ? 'bg-(--color-surface-transparent-tint)' : 'bg-(--color-surface-default)',
         disabled ? 'opacity-50' : '',
@@ -66,7 +82,12 @@ export function PasswordField({
   }
   return (
     <div className={['flex w-80 flex-col gap-2.5', className].filter(Boolean).join(' ')}>
-      {label && <label htmlFor={inputId} className="text-sm leading-5 text-(--color-foreground-default)">{label}</label>}
+      {label && (
+        <div className="flex flex-col gap-0.5">
+          <label htmlFor={inputId} className="text-sm leading-5 text-(--color-foreground-default)">{label}</label>
+          {description && <p className="text-xs leading-[18px] text-(--color-foreground-muted)">{description}</p>}
+        </div>
+      )}
       {field}
     </div>
   );

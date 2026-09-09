@@ -55,6 +55,49 @@ function DisabledOptionDemo() {
 }
 export const DisabledOption: Story = { render: () => <DisabledOptionDemo /> };
 
+/** avatar オプション（doc select-field-content Anatomy「avatar」variant） */
+function WithAvatarDemo() {
+  const [value, setValue] = useState<string | undefined>();
+  const options = [
+    { value: 'alice', label: 'Alice', avatarUrl: 'https://i.pravatar.cc/64?img=1' },
+    { value: 'bob', label: 'Bob', avatarUrl: 'https://i.pravatar.cc/64?img=2' },
+    { value: 'carol', label: 'Carol', avatarUrl: 'https://i.pravatar.cc/64?img=3' },
+  ];
+  return <SelectField label="Assignee" options={options} value={value} onValueChange={setValue} />;
+}
+export const WithAvatar: Story = { render: () => <WithAvatarDemo /> };
+
+/** multi-select（doc select-field-content「multi-select」variant: chip表示 + Allオプション） */
+function MultiSelectDemo() {
+  const [value, setValue] = useState<string[]>(['apple']);
+  return (
+    <SelectField
+      label="Fruits"
+      multiple
+      options={fruitOptions}
+      value={value}
+      onValueChange={setValue}
+    />
+  );
+}
+export const MultiSelect: Story = { render: () => <MultiSelectDemo /> };
+
+/** multi-select, 全選択状態（doc: 全選択時はchipではなく「すべて」テキスト表示） */
+function MultiSelectAllDemo() {
+  const [value, setValue] = useState<string[]>(fruitOptions.map((o) => o.value));
+  return (
+    <SelectField
+      label="Fruits"
+      multiple
+      options={fruitOptions}
+      value={value}
+      onValueChange={setValue}
+      allSelectedLabel="All"
+    />
+  );
+}
+export const MultiSelectAllSelected: Story = { render: () => <MultiSelectAllDemo /> };
+
 /** state: disabled / readonly / error（doc Anatomy「4状態パターン」） */
 export const States: Story = {
   render: () => (
@@ -62,6 +105,15 @@ export const States: Story = {
       <SelectField label="Disabled" options={fruitOptions} disabled onValueChange={() => {}} />
       <SelectField label="Read only" options={fruitOptions} value="apple" readOnly onValueChange={() => {}} />
       <SelectField label="Error" options={fruitOptions} error errorMessage="Error message" onValueChange={() => {}} />
+    </div>
+  ),
+};
+
+/** labelPosition="left" + error（2026-09-09修正確認：エラーメッセージはtriggerの下、右ではない） */
+export const LeftPositionWithError: Story = {
+  render: () => (
+    <div style={{ width: 400 }}>
+      <SelectField label="Label" labelPosition="left" options={fruitOptions} error errorMessage="Error message" onValueChange={() => {}} />
     </div>
   ),
 };

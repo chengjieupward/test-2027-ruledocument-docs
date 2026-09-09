@@ -26,12 +26,15 @@ export const LabelPositions: Story = {
   ),
 };
 
+export const WithDescription: Story = { args: { label: 'Label', description: 'Description text goes here' } };
+
 export const States: Story = {
   render: () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <PasswordField label="Disabled" disabled />
       <PasswordField label="Read only" readOnly value="secret123" />
       <PasswordField label="Error" error errorMessage="Error message" />
+      <PasswordField label="Error, left position" labelPosition="left" error errorMessage="Error message" />
     </div>
   ),
 };

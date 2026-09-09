@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { RadioButton } from './RadioButton';
+import { RadioGroup } from './RadioGroup';
 
 const meta = {
   title: 'Form/RadioButton', component: RadioButton, tags: ['autodocs'],
@@ -52,4 +53,29 @@ export const Disabled: Story = {
       <RadioButton name="disabled" label="Disabled selected" checked disabled onChange={() => {}} />
     </div>
   ),
+};
+
+// RadioGroup demos live here as plain sibling stories (not a separate nested
+// component/folder) -- same convention established for CheckboxGroup.
+function RadioGroupDemo(props: { labelPosition?: 'top' | 'left'; description?: string }) {
+  const options = ['Apple', 'Banana', 'Orange'];
+  const [selected, setSelected] = useState(options[0]);
+  return (
+    <RadioGroup label="Group label" description={props.description} labelPosition={props.labelPosition}>
+      {options.map((opt) => (
+        <RadioButton key={opt} name={`group-${props.labelPosition}-${props.description ? 'desc' : 'plain'}`} label={opt} checked={selected === opt} onChange={() => setSelected(opt)} />
+      ))}
+    </RadioGroup>
+  );
+}
+
+/** RadioGroup, labelPosition="top"（doc default）。description は任意項目のため既定ではoff */
+export const GroupLabelTop: Story = { render: () => <RadioGroupDemo labelPosition="top" /> };
+
+/** RadioGroup, labelPosition="left"。description は任意項目のため既定ではoff */
+export const GroupLabelLeft: Story = { render: () => <RadioGroupDemo labelPosition="left" /> };
+
+/** RadioGroup with description（doc Anatomy: description は任意、CheckboxGroupと同様） */
+export const GroupWithDescription: Story = {
+  render: () => <RadioGroupDemo labelPosition="top" description="Group description" />,
 };
