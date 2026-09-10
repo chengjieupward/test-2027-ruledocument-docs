@@ -16,10 +16,12 @@ const people: Person[] = [
   { id: '2', name: 'Bob Smith', email: 'bob@example.com', role: 'Member' },
   { id: '3', name: 'Carol Davis', email: 'carol@example.com', role: 'Member' },
 ];
+// width is freely set per column (px number); columns with no width share
+// the remaining space evenly (doc: 2026-09-10, width is not a fixed preset)
 const columns = [
-  { key: 'name', header: 'Name', size: 'sm' as const, render: (r: Person) => r.name },
-  { key: 'email', header: 'Email', size: 'md' as const, render: (r: Person) => r.email },
-  { key: 'role', header: 'Role', size: 'sm' as const, render: (r: Person) => r.role },
+  { key: 'name', header: 'Name', width: 160, overflow: 'truncate' as const, render: (r: Person) => r.name },
+  { key: 'email', header: 'Email', overflow: 'truncate' as const, render: (r: Person) => r.email },
+  { key: 'role', header: 'Role', width: 120, overflow: 'truncate' as const, render: (r: Person) => r.role },
 ];
 
 export const Basic: Story = { args: { columns, rows: people, rowKey: (r: Person) => r.id } };
@@ -42,3 +44,20 @@ export const DisabledRow: Story = { render: () => <DisabledRowDemo /> };
 
 /** 空データ */
 export const Empty: Story = { args: { columns, rows: [], rowKey: (r: Person) => r.id } };
+
+/** cell内に複数要素（アイコン+テキスト）→ overflow="wrap"（default）で4pxのgapを保ちつつ自動折り返し */
+interface Task { id: string; name: string; tags: string[]; }
+const tasks: Task[] = [
+  { id: '1', name: 'Design review', tags: ['Design', 'Urgent', 'Q3'] },
+  { id: '2', name: 'Ship release', tags: ['Engineering'] },
+];
+const wrapColumns = [
+  { key: 'name', header: 'Task', width: 160, overflow: 'truncate' as const, render: (r: Task) => r.name },
+  {
+    key: 'tags', header: 'Tags', width: 200,
+    render: (r: Task) => r.tags.map((t) => (
+      <span key={t} className="rounded-md bg-(--color-surface-shade) px-1.5 py-0.5 text-xs">{t}</span>
+    )),
+  },
+];
+export const WrappingCellContent: Story = { args: { columns: wrapColumns, rows: tasks, rowKey: (r: Task) => r.id } };

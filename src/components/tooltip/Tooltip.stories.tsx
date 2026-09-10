@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Info } from '@phosphor-icons/react';
 import { Tooltip } from './Tooltip';
 
 const meta = {
@@ -9,33 +10,41 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const buttonClass = 'rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm';
+// 2026-09-10: trigger is a small icon (not styled-button text), still
+// requires hover/focus to show the tooltip. Wrapped in a generously padded
+// container so a "top"-positioned tooltip has room to render fully instead
+// of getting clipped by the Storybook canvas edge.
+const triggerClass = 'inline-flex cursor-default text-(--color-foreground-muted)';
 
 export const Basic: Story = {
   render: () => (
-    <Tooltip content="Tooltip text">
-      <button type="button" className={buttonClass}>Hover me</button>
-    </Tooltip>
-  ),
-};
-
-/** 四个方向：top / bottom / left / right（本组件实现范围内新增的定位能力） */
-export const Sides: Story = {
-  render: () => (
-    <div style={{ display: 'flex', gap: 48, padding: 40 }}>
-      <Tooltip content="Top" side="top"><button type="button" className={buttonClass}>Top</button></Tooltip>
-      <Tooltip content="Bottom" side="bottom"><button type="button" className={buttonClass}>Bottom</button></Tooltip>
-      <Tooltip content="Left" side="left"><button type="button" className={buttonClass}>Left</button></Tooltip>
-      <Tooltip content="Right" side="right"><button type="button" className={buttonClass}>Right</button></Tooltip>
+    <div style={{ padding: 80 }}>
+      <Tooltip content="Tooltip text">
+        <span className={triggerClass}><Info size={16} /></span>
+      </Tooltip>
     </div>
   ),
 };
 
-/** 超过 240px 最大宽度时自动换行（doc「更新履歴」TT-01） */
+/** 4方向：top / bottom / left / right（本コンポーネント実装範囲内で新規追加した配置機能） */
+export const Sides: Story = {
+  render: () => (
+    <div style={{ display: 'flex', gap: 64, padding: 80 }}>
+      <Tooltip content="Top" side="top"><span className={triggerClass}><Info size={16} /></span></Tooltip>
+      <Tooltip content="Bottom" side="bottom"><span className={triggerClass}><Info size={16} /></span></Tooltip>
+      <Tooltip content="Left" side="left"><span className={triggerClass}><Info size={16} /></span></Tooltip>
+      <Tooltip content="Right" side="right"><span className={triggerClass}><Info size={16} /></span></Tooltip>
+    </div>
+  ),
+};
+
+/** 240px の最大幅を超えると自動的に折り返す（doc「更新履歴」TT-01） */
 export const LongText: Story = {
   render: () => (
-    <Tooltip content="This is a fairly long tooltip message. Once it exceeds the 240px max width, it wraps automatically.">
-      <button type="button" className={buttonClass}>Hover for long text</button>
-    </Tooltip>
+    <div style={{ padding: 80 }}>
+      <Tooltip content="This is a fairly long tooltip message. Once it exceeds the 240px max width, it wraps automatically.">
+        <span className={triggerClass}><Info size={16} /></span>
+      </Tooltip>
+    </div>
   ),
 };

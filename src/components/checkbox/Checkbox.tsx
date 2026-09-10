@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, type InputHTMLAttributes, type ReactNode } from 'react';
 
 /**
- * Checkbox (checkbox-with-label)
+ * Checkbox (checkbox-with-label) + CheckboxMark (the standalone mark)
  * Source: `components/checkbox.md` (doc-only, no Figma access).
  * State colors from the doc's "checkbox-mark State別カラー" table:
  * unchecked/default: white bg + #d2dce3 border (or #f44c4d if error);
@@ -27,32 +27,31 @@ import { useEffect, useId, useRef, type InputHTMLAttributes, type ReactNode } fr
  *   the input's invisible hit area now covers the full 20x20
  * - row now defaults to the doc's 240px width (`w-60`), overridable via
  *   `className`
+ *
+ * 2026-09-10: extracted the mark itself as `CheckboxMark`, exported
+ * separately, so other components (e.g. Table's checkbox column, per
+ * table.md's explicit "reuse checkbox.md's structure, don't reimplement"
+ * rule) can reuse the exact same structure/tokens instead of hand-rolling
+ * their own checkbox visuals.
+ *
+ * Bug found via that extraction: disabled's opacity-50 had only ever been
+ * applied by the outer `<label>` wrapper, so a standalone `CheckboxMark`
+ * (e.g. in Table) never dimmed when disabled+checked/indeterminate --
+ * visually indistinguishable from enabled. Fixed by moving disabled's
+ * opacity onto `CheckboxMark` itself, and onto just the label text
+ * separately in `Checkbox` (not the outer `<label>` anymore), so the two
+ * don't stack into a compounded ~25% opacity on the mark.
  */
 
-export interface CheckboxProps
+export interface CheckboxMarkProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'checked' | 'onChange' | 'size'> {
   checked?: boolean | 'indeterminate';
   onCheckedChange?: (checked: boolean) => void;
-  label: ReactNode;
-  description?: ReactNode;
   error?: boolean;
-  labelPosition?: 'left' | 'right';
+  id?: string;
 }
 
-export function Checkbox({
-  checked = false,
-  onCheckedChange,
-  label,
-  description,
-  error = false,
-  disabled = false,
-  labelPosition = 'right',
-  id,
-  className,
-  ...rest
-}: CheckboxProps) {
-  const autoId = useId();
-  const inputId = id ?? autoId;
+export function CheckboxMark({ checked = false, onCheckedChange, error = false, disabled, id, ...rest }: CheckboxMarkProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const isIndeterminate = checked === 'indeterminate';
   const isChecked = checked === true;
@@ -73,11 +72,11 @@ export function Checkbox({
     ].join(' ');
   }
 
-  const mark = (
-    <span className="relative flex size-5 shrink-0 items-center justify-center p-0.5">
+  return (
+    <span className={['relative flex size-5 shrink-0 items-center justify-center p-0.5', disabled ? 'opacity-50' : ''].join(' ')}>
       <input
         ref={inputRef}
-        id={inputId}
+        id={id}
         type="checkbox"
         checked={isChecked}
         disabled={disabled}
@@ -107,9 +106,46 @@ export function Checkbox({
       </span>
     </span>
   );
+}
+
+export interface CheckboxProps
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'checked' | 'onChange' | 'size'> {
+  checked?: boolean | 'indeterminate';
+  onCheckedChange?: (checked: boolean) => void;
+  label: ReactNode;
+  description?: ReactNode;
+  error?: boolean;
+  labelPosition?: 'left' | 'right';
+}
+
+export function Checkbox({
+  checked = false,
+  onCheckedChange,
+  label,
+  description,
+  error = false,
+  disabled = false,
+  labelPosition = 'right',
+  id,
+  className,
+  ...rest
+}: CheckboxProps) {
+  const autoId = useId();
+  const inputId = id ?? autoId;
+
+  const mark = (
+    <CheckboxMark
+      id={inputId}
+      checked={checked}
+      onCheckedChange={onCheckedChange}
+      error={error}
+      disabled={disabled}
+      {...rest}
+    />
+  );
 
   const labelColumn = (
-    <span className="flex flex-1 flex-col gap-0.5">
+    <span className={['flex flex-1 flex-col gap-0.5', disabled ? 'opacity-50' : ''].join(' ')}>
       <span className="text-sm leading-5 text-(--color-foreground-default)">{label}</span>
       {description && <span className="text-xs leading-[18px] text-(--color-foreground-muted)">{description}</span>}
     </span>
@@ -121,7 +157,7 @@ export function Checkbox({
       className={[
         'flex w-60 items-start py-1.5',
         labelPosition === 'right' ? 'gap-2' : 'gap-4',
-        disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
+        disabled ? 'cursor-not-allowed' : 'cursor-pointer',
         className,
       ].filter(Boolean).join(' ')}
     >

@@ -26,7 +26,7 @@ function GroupDemo() {
 }
 export const Group: Story = { render: () => <GroupDemo /> };
 
-/** label 位置：right(默认，圈在左) / left(圈在右)，doc Anatomy */
+/** label position: right(default) / left、doc Anatomy */
 export const LabelPositions: Story = {
   render: () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4, width: 280 }}>

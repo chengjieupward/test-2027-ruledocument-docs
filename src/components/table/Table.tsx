@@ -1,21 +1,37 @@
 import { useMemo, type ReactNode } from 'react';
+import { CheckboxMark } from '../checkbox/Checkbox';
 
 /**
  * Table
  * Source: `components/table.md` (doc-only, no Figma access).
- * Overall corner radius 28px per doc (number/radius/lg). Column widths from
- * doc's table-slot size table: xs 48px(checkbox) / sm 120px / md 192px / lg 264px.
- * Rewritten as columns+rows props instead of Figma's slot-append pattern, per
- * the doc's own implementation note.
+ * Overall corner radius 28px per doc (number/radius/lg). Rewritten as
+ * columns+rows props instead of Figma's slot-append pattern, per the doc's
+ * own implementation note.
+ *
+ * 2026-09-10 doc revision applied (user-confirmed):
+ * - checkbox column reuses the exact same `CheckboxMark` component
+ *   Checkbox.tsx uses (20x20 hit target, 4px radius, same color tokens),
+ *   instead of a bare native `<input>` styled ad hoc -- the doc explicitly
+ *   says the checkbox column must not be independently reimplemented
+ * - column width is freely set per-column (`width` prop, px number or any
+ *   CSS width string), not restricted to the doc's old xs/sm/md/lg preset
+ *   enum -- same resolution as the analogous "fixed width" questions in
+ *   other components (SelectField/TextareaField/NumberField/DateField).
+ *   Columns with no `width` share the remaining space evenly (flex-1)
+ * - cell content overflow is configurable per column via `overflow`:
+ *   'wrap' (default) lays the cell out as a flex row with a 4px gap that
+ *   wraps when it holds multiple elements (e.g. icon + text); 'truncate'
+ *   single-lines the content with an ellipsis, for plain text columns
+ * - cell padding stays 8px left/right (`px-2`), unchanged from before
  */
-
-export type TableColumnSize = 'sm' | 'md' | 'lg';
-const COLUMN_WIDTH_PX: Record<TableColumnSize, number> = { sm: 120, md: 192, lg: 264 };
 
 export interface TableColumn<Row> {
   key: string;
   header: ReactNode;
-  size?: TableColumnSize;
+  /** Freely settable (px number or any CSS width string). Omit to share remaining space with other width-less columns. */
+  width?: number | string;
+  /** 'wrap' (default): flex row, 4px gap, wraps for multi-element content. 'truncate': single-line ellipsis, for plain text. */
+  overflow?: 'wrap' | 'truncate';
   render: (row: Row) => ReactNode;
 }
 
@@ -30,11 +46,19 @@ export interface TableProps<Row> {
   className?: string;
 }
 
-function HeaderCheckbox({ checked, indeterminate, onChange }: { checked: boolean; indeterminate: boolean; onChange: (checked: boolean) => void }) {
+function ColumnCell({ column, height, children }: { column: TableColumn<unknown>; height: number; children: ReactNode }) {
+  const style = column.width !== undefined ? { width: column.width } : undefined;
   return (
-    <input type="checkbox" checked={checked} ref={(el) => { if (el) el.indeterminate = indeterminate; }}
-      onChange={(e) => onChange(e.target.checked)}
-      className="size-4 rounded-xs border-(--color-border-normal) accent-(--color-button-primary-default)" aria-label="Select all" />
+    <div
+      className={['flex shrink-0 items-center px-2 py-1', column.width === undefined ? 'flex-1 basis-0' : ''].join(' ')}
+      style={{ height, ...style }}
+    >
+      {column.overflow === 'truncate' ? (
+        <span className="block w-full truncate text-sm leading-5 text-(--color-foreground-default)">{children}</span>
+      ) : (
+        <div className="flex w-full flex-wrap items-center gap-1 text-sm leading-5 text-(--color-foreground-default)">{children}</div>
+      )}
+    </div>
   );
 }
 
@@ -56,13 +80,17 @@ export function Table<Row>({ columns, rows, rowKey, selectable = false, selected
       <div className="flex h-9 items-center px-4">
         {selectable && (
           <div className="flex h-9 w-12 shrink-0 items-center justify-center px-2 py-1">
-            <HeaderCheckbox checked={allSelected} indeterminate={!allSelected && someSelected} onChange={toggleAll} />
+            <CheckboxMark
+              checked={allSelected ? true : someSelected ? 'indeterminate' : false}
+              onCheckedChange={toggleAll}
+              aria-label="Select all"
+            />
           </div>
         )}
         {columns.map((col) => (
-          <div key={col.key} className="flex h-9 shrink-0 items-center px-2 py-1" style={{ width: COLUMN_WIDTH_PX[col.size ?? 'sm'] }}>
-            <span className="truncate text-sm font-medium leading-5 text-(--color-foreground-default)">{col.header}</span>
-          </div>
+          <ColumnCell key={col.key} column={col as TableColumn<unknown>} height={36}>
+            <span className="truncate font-medium">{col.header}</span>
+          </ColumnCell>
         ))}
       </div>
       <div>
@@ -74,14 +102,18 @@ export function Table<Row>({ columns, rows, rowKey, selectable = false, selected
             <div key={key} className={['flex h-12 items-center px-4', disabled ? 'pointer-events-none opacity-50' : '', selected ? 'bg-(--color-surface-transparent-tint)' : ''].join(' ')}>
               {selectable && (
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center px-2 py-1">
-                  <input type="checkbox" checked={selected} disabled={disabled} onChange={(e) => toggleOne(key, e.target.checked)}
-                    className="size-4 rounded-xs border-(--color-border-normal) accent-(--color-button-primary-default)" aria-label="Select this row" />
+                  <CheckboxMark
+                    checked={selected}
+                    onCheckedChange={(checked) => toggleOne(key, checked)}
+                    disabled={disabled}
+                    aria-label="Select this row"
+                  />
                 </div>
               )}
               {columns.map((col) => (
-                <div key={col.key} className="flex h-12 shrink-0 items-center px-2 py-1" style={{ width: COLUMN_WIDTH_PX[col.size ?? 'sm'] }}>
-                  <span className="truncate text-sm leading-5 text-(--color-foreground-default)">{col.render(row)}</span>
-                </div>
+                <ColumnCell key={col.key} column={col as TableColumn<unknown>} height={48}>
+                  {col.render(row)}
+                </ColumnCell>
               ))}
             </div>
           );

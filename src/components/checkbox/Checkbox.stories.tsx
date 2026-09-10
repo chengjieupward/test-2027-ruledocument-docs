@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Checkbox } from './Checkbox';
+import { Checkbox, CheckboxMark } from './Checkbox';
 import { CheckboxGroup } from './CheckboxGroup';
 
 const meta = {
@@ -29,7 +29,7 @@ export const CheckedStates: Story = {
   ),
 };
 
-/** label 位置：right(默认，勾选框在左，gap 8px) / left(勾选框在右，gap 16px，doc Layout) */
+/** label position: right(default, gap 8px) / left(gap 16px)、doc Layout */
 export const LabelPositions: Story = {
   render: () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4, width: 280 }}>
@@ -56,6 +56,34 @@ export const Disabled: Story = {
     </div>
   ),
 };
+
+// CheckboxMark is the standalone mark (no label), reused as-is by Table's
+// checkbox column (table.md: must reuse checkbox.md's exact structure, not
+// reimplement independently). Demoed here so it's visible/verifiable on its
+// own, separate from the full label+mark Checkbox. Layout: row 1 = enabled
+// (unchecked/checked/indeterminate x default/error, 6 total), row 2 = the
+// same 6 combinations with disabled applied (faded).
+function CheckboxMarkDemo() {
+  const combos: { checked: boolean | 'indeterminate'; error?: boolean }[] = [
+    { checked: false }, { checked: true }, { checked: 'indeterminate' },
+    { checked: false, error: true }, { checked: true, error: true }, { checked: 'indeterminate', error: true },
+  ];
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
+      <div style={{ display: 'flex', gap: 32 }}>
+        {combos.map((c, i) => (
+          <CheckboxMark key={i} checked={c.checked} error={c.error} onCheckedChange={() => {}} />
+        ))}
+      </div>
+      <div style={{ display: 'flex', gap: 32 }}>
+        {combos.map((c, i) => (
+          <CheckboxMark key={i} checked={c.checked} error={c.error} disabled onCheckedChange={() => {}} />
+        ))}
+      </div>
+    </div>
+  );
+}
+export const MarkOnly: Story = { render: () => <CheckboxMarkDemo /> };
 
 // CheckboxGroup demos live here as plain sibling stories (not a separate
 // nested component/folder), per user request -- CheckboxGroup is just a

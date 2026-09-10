@@ -26,3 +26,5 @@ export const Types: Story = {
 };
 
 export const WithoutIcon: Story = { args: { type: 'info', title: 'Title', icon: false } };
+
+export const WithoutDescription: Story = { args: { type: 'info', title: 'Title' } };

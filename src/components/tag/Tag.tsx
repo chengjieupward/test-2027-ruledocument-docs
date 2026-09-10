@@ -81,7 +81,7 @@ export function Tag({ color = 'green', fill = true, label, onClose, className }:
           type="button"
           onClick={onClose}
           aria-label="Remove"
-          className="flex size-[22px] shrink-0 items-center justify-center rounded-full hover:brightness-90"
+          className="flex size-[22px] shrink-0 appearance-none items-center justify-center rounded-full border-0 p-0 outline-none hover:brightness-90"
         >
           <XCircle size={20} weight="fill" color={fill ? 'white' : ACCENT_COLOR_VAR[color]} />
         </button>

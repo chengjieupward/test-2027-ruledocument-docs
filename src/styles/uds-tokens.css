@@ -62,12 +62,52 @@
   --color-purple-50: #984eff;
   --color-blue-50: #0070fa;
 
-  /* typography/body/md/regular (foundations-color-typography.md)
-     2026-09-09 新規追加：button.md の指摘により、Button と Typography.Body が
-     共有する単一の参照元として追加。今後 Typography.Body 側もこのトークンを
-     参照するように更新すること（現状はまだ Typography.Body 内に数値が
-     ハードコードされたまま、かつ全体のCSSのフォントは system-ui のまま） */
-  --typography-body-md-regular-font-family: 'Noto Sans JP', system-ui, sans-serif;
-  --typography-body-md-regular-font-size: 14px;
-  --typography-body-md-regular-line-height: 20px;
+  /* typography (foundations-color-typography.md)
+     2026-09-10 訂正：Button が参照していた --typography-body-md-regular-* は
+     Typography.Heading/Body/Stat 側では未使用のままだった（技術的負債として
+     button.md に記録済み）。今回、Heading/Body/Stat 全スケールの
+     font-family/font-size/line-height をトークン化し、Typography.tsx 側も
+     これらを参照するように統一した。あわせて --typography-body-md-regular-*
+     は「-regular-」を除いた --typography-body-md-* にリネームし（Body は
+     weight（regular/bold）に関わらずサイズごとのfont-size/line-heightは
+     共通のため）、Button.tsx 側の参照もリネーム後の名前に追従させた */
+  --typography-font-family: 'Noto Sans JP', system-ui, sans-serif;
+
+  --typography-heading-font-weight: 500;
+  --typography-heading-2xl-font-size: 27px;
+  --typography-heading-2xl-line-height: 32px;
+  --typography-heading-xl-font-size: 22px;
+  --typography-heading-xl-line-height: 28px;
+  --typography-heading-lg-font-size: 19px;
+  --typography-heading-lg-line-height: 24px;
+  --typography-heading-md-font-size: 16px;
+  --typography-heading-md-line-height: 22px;
+  --typography-heading-sm-font-size: 14px;
+  --typography-heading-sm-line-height: 20px;
+  --typography-heading-xs-font-size: 12px;
+  --typography-heading-xs-line-height: 18px;
+
+  --typography-body-lg-font-size: 16px;
+  --typography-body-lg-line-height: 22px;
+  --typography-body-md-font-size: 14px;
+  --typography-body-md-line-height: 20px;
+  --typography-body-sm-font-size: 12px;
+  --typography-body-sm-line-height: 18px;
+  --typography-body-xs-font-size: 11px;
+  --typography-body-xs-line-height: 15px;
+
+  --typography-stat-font-family: '"SF Pro Rounded", ui-rounded, sans-serif';
+  --typography-stat-lg-font-size: 27px;
+  --typography-stat-lg-line-height: 32px;
+  --typography-stat-md-font-size: 22px;
+  --typography-stat-md-line-height: 28px;
+
+  /* color/feedback/status/* (toast.md)
+     2026-09-10 新規追加：旧実装は border 系トークン（--color-border-accent/danger/success）
+     で代用していたが、ユーザー確認によりtoast.md記載通りの専用トークンとして正式に追加した。
+     アイコンがFigma上で画像アセットとして書き出されているため実測による色検証はできておらず、
+     視覚的に等価な既存のborder系トークンと同じhex値を暫定採用している（要将来的な確認） */
+  --color-feedback-status-information: #0070fa;
+  --color-feedback-status-danger: #f44c4d;
+  --color-feedback-status-success: #1dc338;
 }

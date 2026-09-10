@@ -5,7 +5,7 @@ const meta = { title: 'Foundations/Typography', tags: ['autodocs'], parameters: 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** 全6种尺寸（doc: foundations-color-typography.md「スケール構成」表） */
+/** 全6サイズ（doc: foundations-color-typography.md「スケール構成」表） */
 export const HeadingSizes: Story = {
   render: () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -19,7 +19,7 @@ export const HeadingSizes: Story = {
   ),
 };
 
-/** 全8种组合：4个尺寸 × 2种字重（doc同上表） */
+/** 全8組み合わせ：4サイズ × 2ウェイト（doc同上表） */
 export const BodySizes: Story = {
   render: () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -35,7 +35,7 @@ export const BodySizes: Story = {
   ),
 };
 
-/** 全2种尺寸（doc同上表：Number display は size のみ、字重の分岐なし） */
+/** 全2サイズ（doc同上表：Number display は size のみ、字重の分岐なし） */
 export const StatSizes: Story = {
   render: () => (
     <div style={{ display: 'flex', alignItems: 'baseline', gap: 24 }}>
@@ -50,6 +50,30 @@ export const HeadingTruncates: Story = {
   render: () => (
     <div style={{ width: 240 }}>
       <Heading size="md">This is a very very very long heading used to demonstrate single-line truncation with an ellipsis</Heading>
+    </div>
+  ),
+};
+
+/** width: "fixed"（doc既定値：Heading 240px / Body 160px） / "fill"（親コンテナに合わせる、ユーザー要件） */
+export const Width: Story = {
+  render: () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, width: 400 }}>
+      <div>
+        <span style={{ fontSize: 12, color: '#75808c' }}>Heading, width="fixed"（240px）</span>
+        <Heading size="md" width="fixed">Fixed width heading</Heading>
+      </div>
+      <div>
+        <span style={{ fontSize: 12, color: '#75808c' }}>Heading, width="fill"（親コンテナの幅いっぱい）</span>
+        <Heading size="md" width="fill">Fill width heading</Heading>
+      </div>
+      <div>
+        <span style={{ fontSize: 12, color: '#75808c' }}>Body, width="fixed"（160px）</span>
+        <Body size="md" width="fixed">Fixed width body text that wraps within 160px.</Body>
+      </div>
+      <div>
+        <span style={{ fontSize: 12, color: '#75808c' }}>Body, width="fill"（親コンテナの幅いっぱい）</span>
+        <Body size="md" width="fill">Fill width body text that wraps within the full container width.</Body>
+      </div>
     </div>
   ),
 };

@@ -37,3 +37,14 @@ export const Sizes: Story = {
     </div>
   ),
 };
+
+/** weight: fill / bold / regular（doc「desktop-icon仕様」表） */
+export const Weights: Story = {
+  render: () => (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+      <Icon size="lg" weight="regular"><Check /></Icon>
+      <Icon size="lg" weight="bold"><Check /></Icon>
+      <Icon size="lg" weight="fill"><Check /></Icon>
+    </div>
+  ),
+};

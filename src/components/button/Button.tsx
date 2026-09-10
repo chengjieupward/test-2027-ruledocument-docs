@@ -127,9 +127,9 @@ export function Button({
         // typography / body / md / regular (foundations-color-typography.md) --
         // single source of truth, same token Typography.Body uses, not a
         // standalone hardcoded value.
-        fontFamily: 'var(--typography-body-md-regular-font-family)',
-        fontSize: 'var(--typography-body-md-regular-font-size)',
-        lineHeight: 'var(--typography-body-md-regular-line-height)',
+        fontFamily: 'var(--typography-font-family)',
+        fontSize: 'var(--typography-body-md-font-size)',
+        lineHeight: 'var(--typography-body-md-line-height)',
         fontWeight: 400,
       }}
       {...rest}

@@ -1,4 +1,4 @@
-import { X, CheckCircle, Warning, Info } from '@phosphor-icons/react';
+import { XCircle, CheckCircle, Warning, Info } from '@phosphor-icons/react';
 import type { ReactNode } from 'react';
 
 /**
@@ -9,6 +9,11 @@ import type { ReactNode } from 'react';
  * warning border #ff970c bg #fff5ec (warning uses a different token pattern
  * per the doc's explicit warning note -- not a copy error).
  * Rule: icon and type are a fixed pair, not swappable (callout.md Rules).
+ *
+ * 2026-09-10 doc revision applied (user-confirmed):
+ * - danger icon is `XCircle` (circle + X combined glyph), not a bare `X` --
+ *   doc names the icon "x-circle" specifically; same fix already applied to
+ *   Tag's close button
  */
 
 export type CalloutType = 'info' | 'danger' | 'success' | 'warning';
@@ -33,7 +38,7 @@ function CalloutIcon({ type }: { type: CalloutType }) {
     case 'info':
       return <Info size={20} color="var(--color-border-accent)" weight="fill" />;
     case 'danger':
-      return <X size={20} color="var(--color-border-danger)" weight="bold" />;
+      return <XCircle size={20} color="var(--color-border-danger)" weight="fill" />;
     case 'success':
       return <CheckCircle size={20} color="var(--color-border-success)" weight="fill" />;
     case 'warning':
