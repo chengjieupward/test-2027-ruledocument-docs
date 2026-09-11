@@ -23,6 +23,14 @@ import { CheckboxMark } from '../checkbox/Checkbox';
  *   wraps when it holds multiple elements (e.g. icon + text); 'truncate'
  *   single-lines the content with an ellipsis, for plain text columns
  * - cell padding stays 8px left/right (`px-2`), unchanged from before
+ * - rows can optionally show a top border via the `rowBorder` prop (off by
+ *   default) -- using border-TOP (not bottom) so the divider also appears
+ *   between the heading row and the first content row, not just between
+ *   content rows. Whether a border reads well depends on what's inside the
+ *   row's cells -- dense/multi-line slot content usually benefits from a
+ *   visible separator, plain single-line text often doesn't need one -- so
+ *   this is left to the consumer to decide per use case rather than forced
+ *   on or off
  */
 
 export interface TableColumn<Row> {
@@ -43,6 +51,8 @@ export interface TableProps<Row> {
   selectedKeys?: string[];
   onSelectedKeysChange?: (keys: string[]) => void;
   disabledRowKeys?: string[];
+  /** Whether each content row shows a bottom border. Optional -- whether this reads better on/off depends on what's inside the row's cells (e.g. dense multi-line content often wants a border, simple single-line text often doesn't). Off by default. */
+  rowBorder?: boolean;
   className?: string;
 }
 
@@ -62,7 +72,7 @@ function ColumnCell({ column, height, children }: { column: TableColumn<unknown>
   );
 }
 
-export function Table<Row>({ columns, rows, rowKey, selectable = false, selectedKeys = [], onSelectedKeysChange, disabledRowKeys = [], className }: TableProps<Row>) {
+export function Table<Row>({ columns, rows, rowKey, selectable = false, selectedKeys = [], onSelectedKeysChange, disabledRowKeys = [], rowBorder = false, className }: TableProps<Row>) {
   const selectedSet = useMemo(() => new Set(selectedKeys), [selectedKeys]);
   const selectableRowKeys = useMemo(() => rows.map(rowKey).filter((k) => !disabledRowKeys.includes(k)), [rows, rowKey, disabledRowKeys]);
   const allSelected = selectableRowKeys.length > 0 && selectableRowKeys.every((k) => selectedSet.has(k));
@@ -99,7 +109,12 @@ export function Table<Row>({ columns, rows, rowKey, selectable = false, selected
           const disabled = disabledRowKeys.includes(key);
           const selected = selectedSet.has(key);
           return (
-            <div key={key} className={['flex h-12 items-center px-4', disabled ? 'pointer-events-none opacity-50' : '', selected ? 'bg-(--color-surface-transparent-tint)' : ''].join(' ')}>
+            <div key={key} className={[
+              'flex h-12 items-center px-4',
+              rowBorder ? 'border-t border-(--color-border-normal)' : '',
+              disabled ? 'pointer-events-none opacity-50' : '',
+              selected ? 'bg-(--color-surface-transparent-tint)' : '',
+            ].join(' ')}>
               {selectable && (
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center px-2 py-1">
                   <CheckboxMark

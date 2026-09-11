@@ -37,6 +37,18 @@ import type { ReactNode } from 'react';
  * - content supports 3 variants, same as Tag/Tab (user-provided, not in the
  *   original doc): text only / icon before (icon + label) / icon only (icon,
  *   no label -- requires `iconLabel` for accessibility)
+ *
+ * 2026-09-11 revision applied (user-confirmed):
+ * - the selected background is now a single sliding "thumb" element that
+ *   animates from one option's position to another (left + width transition),
+ *   instead of each button independently toggling its own white background
+ *   on/off. This is what makes selection changes read as a slide rather than
+ *   an abrupt swap. The thumb sits behind the buttons (z-index), sized and
+ *   positioned by percentage math that accounts for the outer container's
+ *   own 2px padding
+ * - unselected buttons have no hover background at all (removed per user
+ *   request) -- the sliding thumb itself is the only visual feedback for
+ *   which option is active
  */
 
 export type SegmentedControlSize = 'md' | 'sm';
@@ -74,8 +86,27 @@ export function SegmentedControl<T extends string = string>({
     console.warn(`SegmentedControl: items are capped at 6 (same rule as Tab); received ${options.length}.`);
   }
   const height = size === 'md' ? 40 : 32;
+  const count = options.length;
+  const selectedIndex = options.findIndex((o) => o.value === value);
+  const innerRadius = OUTER_RADIUS[size][radius] - 2;
+
   return (
-    <div role="tablist" className={['flex bg-(--color-surface-tint) p-0.5', className].filter(Boolean).join(' ')} style={{ height, borderRadius: OUTER_RADIUS[size][radius] }}>
+    <div role="tablist" className={['relative flex bg-(--color-surface-tint) p-0.5', className].filter(Boolean).join(' ')} style={{ height, borderRadius: OUTER_RADIUS[size][radius] }}>
+      {count > 0 && selectedIndex >= 0 && (
+        // sliding thumb: a single element that animates between positions,
+        // instead of each button toggling its own background independently
+        <div
+          aria-hidden="true"
+          className="absolute z-0 bg-(--color-surface-default) shadow-[inset_0_0_0_1px_var(--color-border-soft)] transition-[left] duration-200 ease-out"
+          style={{
+            top: 2,
+            bottom: 2,
+            left: `calc(2px + (100% - 4px) * ${selectedIndex} / ${count})`,
+            width: `calc((100% - 4px) / ${count})`,
+            borderRadius: innerRadius,
+          }}
+        />
+      )}
       {options.map((option) => {
         const selected = option.value === value;
         const iconOnly = Boolean(option.icon) && !option.label;
@@ -85,14 +116,11 @@ export function SegmentedControl<T extends string = string>({
             disabled={option.disabled}
             onClick={() => onValueChange(option.value)}
             className={[
-              'flex flex-1 min-w-0 items-center justify-center gap-2 px-4 text-sm leading-5 outline-none transition-colors',
+              'relative z-10 flex flex-1 min-w-0 items-center justify-center gap-2 px-4 text-sm leading-5 outline-none transition-colors',
               'focus-visible:ring-2 focus-visible:ring-(--color-system-focus-ring) focus-visible:ring-offset-1',
-              'disabled:pointer-events-none disabled:opacity-50',
-              selected
-                ? 'bg-(--color-surface-default) shadow-[inset_0_0_0_1px_var(--color-border-soft)] text-(--color-foreground-default)'
-                : 'text-(--color-foreground-default) hover:bg-(--color-surface-transparent-tint)',
+              'disabled:pointer-events-none disabled:opacity-50 text-(--color-foreground-default)',
             ].join(' ')}
-            style={{ borderRadius: OUTER_RADIUS[size][radius] - 2 }}
+            style={{ borderRadius: innerRadius }}
           >
             {option.icon}
             {option.label && <span className="truncate">{option.label}</span>}

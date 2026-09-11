@@ -61,3 +61,9 @@ const wrapColumns = [
   },
 ];
 export const WrappingCellContent: Story = { args: { columns: wrapColumns, rows: tasks, rowKey: (r: Task) => r.id } };
+
+/** rowBorder: 行の上線（border-top）表示は任意（`rowBorder` prop、デフォルトoff）。
+    上線にすることでheading-rowと最初のcontent行の間にも区切り線が入る。
+    slot内のコンテンツの密度・複雑さによって、境界線がある方が見やすい場合とない方がすっきりする場合があるため、
+    使用者側の判断に委ねる方針とした */
+export const WithRowBorder: Story = { args: { columns, rows: people, rowKey: (r: Person) => r.id, rowBorder: true } };

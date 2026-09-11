@@ -1,5 +1,6 @@
-import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
-import { CaretDown, Check, X } from '@phosphor-icons/react';
+import { Fragment, useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { CaretDown, Check, XCircle } from '@phosphor-icons/react';
+import { Button } from '../button/Button';
 
 /**
  * SelectField (single-select + multi-select)
@@ -25,7 +26,22 @@ import { CaretDown, Check, X } from '@phosphor-icons/react';
  * - added multi-select: chip display in the trigger (or "All" text label
  *   when every option is selected, per doc), a checkbox-style indicator per
  *   item instead of a checkmark, and an "All" pseudo-option at the top of the
- *   list. Per doc, Chip is 24px tall, 6px radius, `color/surface/shade` bg
+ *   list. Per doc, Chip is 24px tall, 6px radius, `color/surface/shade` bg.
+ *   Chip's own close button reuses the real `Button` component (`kind="inner"
+ *   size="sm"`, 24x24px) with an `XCircle` (x-circle) icon at 20px
+ *   (desktop-icon=md) -- matches the chip's own height exactly. Icon color
+ *   is `color/foreground/subtle`, not `-muted` (team decision)
+ *
+ * 2026-09-10 doc revision applied:
+ * - dropdown caret toggle reuses the real `Button` component (`kind="inner"
+ *   size="sm"` (24x24px, radius 12, containing a 16px desktop-icon) --
+ *   kept small deliberately so the arrow doesn't visually compete with the
+ *   trigger's own content (team decision)
+ *   -- team decision, matching the same fix applied to Accordion's toggle
+ * - added group-name support: options can carry an optional `group` label;
+ *   consecutive options sharing the same group get a bold group-name header
+ *   row above them, with an optional count badge (`color/foreground/muted`)
+ *   -- this was previously flagged in the doc as "未実装、別途対応要"
  */
 
 export interface SelectOption<T extends string = string> {
@@ -35,6 +51,8 @@ export interface SelectOption<T extends string = string> {
   avatarUrl?: string;
   avatarAlt?: string;
   disabled?: boolean;
+  /** Optional group name. Consecutive options sharing the same group get a bold group-name header row (with an item-count badge) above them. */
+  group?: string;
 }
 
 interface SelectFieldBaseProps<T extends string = string> {
@@ -72,14 +90,16 @@ function Chip({ label, onRemove }: { label: ReactNode; onRemove: () => void }) {
   return (
     <span className="inline-flex h-6 max-w-full items-center gap-1 rounded-md bg-(--color-surface-shade) pl-1.5 text-sm leading-5 text-(--color-foreground-default)">
       <span className="truncate">{label}</span>
-      <button
-        type="button"
+      {/* close button: real inner-button (kind="inner" size="sm"), 24x24px,
+          containing a 20px desktop-icon (x-circle) -- matches the chip's
+          own 24px height exactly, no overflow. */}
+      <Button
+        kind="inner"
+        size="sm"
         onClick={(e) => { e.stopPropagation(); onRemove(); }}
         aria-label="Remove"
-        className="flex size-6 shrink-0 items-center justify-center text-(--color-foreground-muted)"
-      >
-        <X size={14} />
-      </button>
+        iconBefore={<XCircle size={20} color="var(--color-foreground-subtle)" weight="fill" />}
+      />
     </span>
   );
 }
@@ -229,15 +249,34 @@ export function SelectField<T extends string = string>(props: SelectFieldProps<T
         onKeyDown={onTriggerKeyDown}
         aria-haspopup="listbox" aria-expanded={open}
         className={[
-          'flex h-10 w-full items-center gap-2 rounded-xl border pl-3 pr-1.5 text-left',
+          'flex h-10 w-full items-center gap-2 rounded-xl border pl-2 pr-1.5 text-left',
           error ? 'border-(--color-border-danger)' : 'border-(--color-border-normal)',
           readOnly ? 'bg-(--color-surface-transparent-tint)' : 'bg-(--color-surface-default)',
           disabled ? 'opacity-50' : '',
         ].join(' ')}>
-        {triggerContent()}
-        <span className="flex size-8 shrink-0 items-center justify-center rounded-2xl">
-          <CaretDown size={20} color="var(--color-foreground-default)" style={{ transform: open ? 'rotate(180deg)' : undefined, transition: 'transform 150ms ease' }} />
+        {/* content wrapper: pl-1 (4px) for placeholder/all-selected text
+            (8+4=12px total, same as before). The partial (chip list) state
+            gets pl-0 instead (8px total) -- deliberately less than the other
+            two states, per team decision, to tighten the chip layout even
+            though it means the trigger's left inset changes slightly when
+            switching between chip and non-chip content. */}
+        <span className={['flex min-w-0 flex-1 items-center gap-2', multiple && selectedValues.length > 0 && !isAllSelected ? '' : 'pl-1'].join(' ')}>
+          {triggerContent()}
         </span>
+        <Button
+          kind="inner"
+          size="sm"
+          tabIndex={-1}
+          aria-hidden="true"
+          className="pointer-events-none"
+          iconBefore={
+            <CaretDown
+              size={16}
+              color="var(--color-foreground-default)"
+              style={{ transform: open ? 'rotate(180deg)' : undefined, transition: 'transform 150ms ease' }}
+            />
+          }
+        />
       </button>
       {open && (
         <ul role="listbox" aria-multiselectable={multiple || undefined} className="absolute left-0 right-0 top-[calc(100%+4px)] z-10 max-h-72 w-80 overflow-auto rounded-xl bg-(--color-surface-default) p-0.5 shadow-[0_2px_8px_rgba(0,0,0,0.2)]">
@@ -256,21 +295,31 @@ export function SelectField<T extends string = string>(props: SelectFieldProps<T
             const rowIndex = multiple ? index + 1 : index;
             const isSelected = selectedValues.includes(opt.value);
             const isActive = rowIndex === activeIndex;
+            const isNewGroup = opt.group && options[index - 1]?.group !== opt.group;
+            const groupCount = isNewGroup ? options.filter((o) => o.group === opt.group).length : 0;
             return (
-              <li key={opt.value} role="option" aria-selected={isSelected} aria-disabled={opt.disabled}
-                onMouseEnter={() => setActiveIndex(rowIndex)} onClick={() => commit(index)}
-                className={[
-                  'flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2',
-                  opt.disabled ? 'pointer-events-none opacity-50' : '',
-                  isActive ? 'ring-2 ring-(--color-system-focus-ring)' : 'hover:bg-(--color-surface-transparent-tint)',
-                ].join(' ')}>
-                {opt.avatarUrl && <OptionAvatar src={opt.avatarUrl} alt={opt.avatarAlt} />}
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm leading-5 text-(--color-foreground-default)">{opt.label}</span>
-                  {opt.description && <span className="block truncate text-xs leading-[18px] text-(--color-foreground-muted)">{opt.description}</span>}
-                </span>
-                {multiple ? <ItemCheckbox checked={isSelected} /> : isSelected && <Check size={20} color="var(--color-foreground-default)" />}
-              </li>
+              <Fragment key={opt.value}>
+                {isNewGroup && (
+                  <li key={`group-${opt.group}`} role="presentation" className="flex items-center gap-2 px-3 pt-2 pb-1">
+                    <span className="min-w-0 flex-1 truncate text-sm font-bold leading-5 text-(--color-foreground-default)">{opt.group}</span>
+                    <span className="shrink-0 text-xs leading-[18px] text-(--color-foreground-muted)">{groupCount}</span>
+                  </li>
+                )}
+                <li role="option" aria-selected={isSelected} aria-disabled={opt.disabled}
+                  onMouseEnter={() => setActiveIndex(rowIndex)} onClick={() => commit(index)}
+                  className={[
+                    'flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2',
+                    opt.disabled ? 'pointer-events-none opacity-50' : '',
+                    isActive ? 'ring-2 ring-(--color-system-focus-ring)' : 'hover:bg-(--color-surface-transparent-tint)',
+                  ].join(' ')}>
+                  {opt.avatarUrl && <OptionAvatar src={opt.avatarUrl} alt={opt.avatarAlt} />}
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm leading-5 text-(--color-foreground-default)">{opt.label}</span>
+                    {opt.description && <span className="block truncate text-xs leading-[18px] text-(--color-foreground-muted)">{opt.description}</span>}
+                  </span>
+                  {multiple ? <ItemCheckbox checked={isSelected} /> : isSelected && <Check size={20} color="var(--color-foreground-default)" />}
+                </li>
+              </Fragment>
             );
           })}
         </ul>

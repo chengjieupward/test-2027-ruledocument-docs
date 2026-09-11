@@ -1,5 +1,6 @@
 import { useId, useState, type ReactNode } from 'react';
 import { CaretDown } from '@phosphor-icons/react';
+import { Button } from '../button/Button';
 
 /**
  * AccordionSection
@@ -11,13 +12,15 @@ import { CaretDown } from '@phosphor-icons/react';
  *   not duplicated on the header itself (previous version double-counted
  *   this and rendered ~22px too tall)
  * - Description uses `--color-foreground-muted`, not `-subtle`
- * - the open/close toggle is a dedicated 24x24px InnerButton-style
- *   icon button (radius=12=half height), not a 32x32px button, and it
- *   is the only clickable element -- the rest of the header row only
- *   shows the hover tint, it does not toggle on click
+ * - width fixed at 360px per doc Rules; no nesting supported
+ *
+ * 2026-09-10 doc revision applied (team decision):
+ * - the open/close toggle now reuses the real `Button` component
+ *   (`kind="inner" size="md"`, 32x32px, radius 16, containing a 16px
+ *   desktop-icon) instead of a hand-rolled `<button>` that only
+ *   coincidentally matched dimensions
  * - caret-down is a single icon rotated 180deg via CSS transform when
  *   open, never swapped for a separate caret-up icon
- * - width fixed at 360px per doc Rules; no nesting supported
  */
 
 export interface AccordionSectionProps {
@@ -62,20 +65,22 @@ export function AccordionSection({
           )}
         </div>
         {/* toggle: InnerButton, 24x24px, radius=12 (full=half of height) */}
-        <button
-          type="button"
+        {/* toggle: real inner-button (kind="inner" size="md"), 32x32px, radius 16, 16px desktop-icon */}
+        <Button
+          kind="inner"
+          size="md"
           onClick={toggle}
           aria-expanded={open}
           aria-controls={bodyId}
           aria-label={open ? 'Collapse' : 'Expand'}
-          className="flex size-6 shrink-0 items-center justify-center rounded-xl hover:bg-(--color-surface-transparent-tint) active:bg-(--color-surface-transparent-shade) transition-colors duration-100"
-        >
-          <CaretDown
-            size={16}
-            color="var(--color-foreground-default)"
-            style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 150ms ease' }}
-          />
-        </button>
+          iconBefore={
+            <CaretDown
+              size={16}
+              color="var(--color-foreground-default)"
+              style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 150ms ease' }}
+            />
+          }
+        />
       </div>
       <div
         id={bodyId}

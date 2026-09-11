@@ -117,3 +117,17 @@ export const LeftPositionWithError: Story = {
     </div>
   ),
 };
+
+/** group-name行：連続するoptionが同じgroupを持つ場合、太字のグループ見出し＋件数バッジを表示（doc: group-name行、2026-09-10実装） */
+function GroupedDemo() {
+  const [value, setValue] = useState<string | undefined>();
+  const groupedOptions = [
+    { value: 'apple', label: 'Apple', group: 'Fruits' },
+    { value: 'banana', label: 'Banana', group: 'Fruits' },
+    { value: 'orange', label: 'Orange', group: 'Fruits' },
+    { value: 'carrot', label: 'Carrot', group: 'Vegetables' },
+    { value: 'potato', label: 'Potato', group: 'Vegetables' },
+  ];
+  return <SelectField label="Label" options={groupedOptions} value={value} onValueChange={setValue} />;
+}
+export const GroupedOptions: Story = { render: () => <GroupedDemo /> };
