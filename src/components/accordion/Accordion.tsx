@@ -16,9 +16,9 @@ import { Button } from '../button/Button';
  *
  * 2026-09-10 doc revision applied (team decision):
  * - the open/close toggle now reuses the real `Button` component
- *   (`kind="inner" size="md"`, 32x32px, radius 16, containing a 16px
- *   desktop-icon) instead of a hand-rolled `<button>` that only
- *   coincidentally matched dimensions
+ *   (`kind="inner" size="sm"`, 24x24px, radius 12, containing a 16px
+ *   desktop-icon) -- kept small deliberately so the arrow doesn't visually
+ *   compete with the row's own content (team decision)
  * - caret-down is a single icon rotated 180deg via CSS transform when
  *   open, never swapped for a separate caret-up icon
  */
@@ -65,10 +65,10 @@ export function AccordionSection({
           )}
         </div>
         {/* toggle: InnerButton, 24x24px, radius=12 (full=half of height) */}
-        {/* toggle: real inner-button (kind="inner" size="md"), 32x32px, radius 16, 16px desktop-icon */}
+        {/* toggle: real inner-button (kind="inner" size="sm"), 24x24px, radius 12, 16px desktop-icon */}
         <Button
           kind="inner"
-          size="md"
+          size="sm"
           onClick={toggle}
           aria-expanded={open}
           aria-controls={bodyId}
